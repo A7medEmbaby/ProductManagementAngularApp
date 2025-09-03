@@ -1,1 +1,62 @@
 /* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body { 
+  height: 100%; 
+}
+
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+}
+
+/* Custom utility classes */
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mat-mdc-form-field + .mat-mdc-form-field {
+  margin-left: 8px;
+}
+
+/* Loading spinner overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Table responsive */
+.mat-mdc-table {
+  overflow: auto;
+}
+
+/* Card spacing */
+.mat-mdc-card {
+  margin-bottom: 16px;
+}
+
+/* Form spacing */
+.mat-mdc-form-field {
+  margin-bottom: 16px;
+}
+
+/* Button spacing */
+.mat-mdc-button, .mat-mdc-raised-button {
+  margin-right: 8px;
+}
+
+.mat-mdc-button:last-child, .mat-mdc-raised-button:last-child {
+  margin-right: 0;
+}
