@@ -331,7 +331,7 @@ The application includes several performance optimizations:
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/A7medEmbaby)
+- GitHub: [@A7medEmbaby](https://github.com/A7medEmbaby)
 - Email: a7medembaby@gmail.com
 
 
