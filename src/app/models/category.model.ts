@@ -1,6 +1,7 @@
 export interface Category {
   id: string;
   name: string;
+  productCount: number;  // Added this field
   createdAt: string;
   updatedAt?: string;
 }

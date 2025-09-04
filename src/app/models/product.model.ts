@@ -17,6 +17,7 @@ export interface CreateProductRequest {
 
 export interface UpdateProductRequest {
   name: string;
+  categoryId: string;  // Added this field as required
   price: number;
   currency?: string;
 }

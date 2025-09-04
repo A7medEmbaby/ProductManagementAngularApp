@@ -129,6 +129,24 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
                 </td>
               </ng-container>
 
+              <!-- Product Count Column -->
+              <ng-container matColumnDef="productCount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                  <span class="header-content">
+                    <mat-icon>inventory</mat-icon>
+                    Products
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let category">
+                  <div class="product-count-display">
+                    <mat-chip class="count-chip">
+                      {{ category.productCount }}
+                      {{ category.productCount === 1 ? 'Product' : 'Products' }}
+                    </mat-chip>
+                  </div>
+                </td>
+              </ng-container>
+
               <!-- Created Date Column -->
               <ng-container matColumnDef="createdAt">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -178,7 +196,7 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
                     <button
                       mat-icon-button
                       color="primary"
-                      (click)="editCategory(category)"
+                      (click)="editCategory(category); $event.stopPropagation()"
                       matTooltip="Edit Category"
                       class="action-button edit-btn"
                     >
@@ -210,10 +228,14 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
                         mat-menu-item
                         (click)="deleteCategory(category)"
                         class="delete-action"
+                        [disabled]="category.productCount > 0"
                       >
                         <mat-icon color="warn">delete</mat-icon>
                         <span>Delete</span>
                       </button>
+                      <div *ngIf="category.productCount > 0" class="delete-warning">
+                        <small>Cannot delete category with products</small>
+                      </div>
                     </mat-menu>
                   </div>
                 </td>
@@ -259,6 +281,9 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
             <span class="result-count">
               Showing {{ getDisplayCount() }} of
               {{ getTotalCount() }} categories
+            </span>
+            <span class="total-products">
+              Total Products: {{ getTotalProductCount() }}
             </span>
           </div>
         </div>
@@ -484,6 +509,20 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
         font-family: 'Courier New', monospace;
       }
 
+      .product-count-display {
+        display: flex;
+        align-items: center;
+      }
+
+      .count-chip {
+        background: linear-gradient(135deg, #2196f3, #03a9f4);
+        color: white;
+        font-weight: 500;
+        font-size: 0.75rem;
+        height: 28px;
+        border-radius: 14px;
+      }
+
       .date-display {
         display: flex;
         flex-direction: column;
@@ -544,6 +583,17 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
         color: var(--warn-color);
       }
 
+      .action-menu .delete-action:disabled {
+        color: var(--text-secondary);
+        opacity: 0.5;
+      }
+
+      .delete-warning {
+        padding: 0 16px;
+        color: var(--text-secondary);
+        font-style: italic;
+      }
+
       .empty-state {
         text-align: center;
         padding: var(--spacing-xxl) var(--spacing-lg);
@@ -594,12 +644,21 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
       .summary-info {
         display: flex;
         align-items: center;
+        gap: var(--spacing-xl);
+        flex-wrap: wrap;
+        justify-content: center;
       }
 
-      .result-count {
+      .result-count,
+      .total-products {
         font-size: 0.875rem;
         color: var(--text-secondary);
         font-weight: 500;
+      }
+
+      .total-products {
+        color: var(--primary-color);
+        font-weight: 600;
       }
 
       /* Animations */
@@ -698,6 +757,11 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
           width: 32px;
           height: 32px;
         }
+
+        .summary-info {
+          flex-direction: column;
+          gap: var(--spacing-sm);
+        }
       }
     `,
   ],
@@ -705,7 +769,7 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.compo
 export class CategoryListComponent implements OnInit {
   categories: Category[] = [];
   dataSource = new MatTableDataSource<Category>([]);
-  displayedColumns: string[] = ['name', 'createdAt', 'status', 'actions'];
+  displayedColumns: string[] = ['name', 'productCount', 'createdAt', 'status', 'actions'];
   loading = false;
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -757,6 +821,10 @@ export class CategoryListComponent implements OnInit {
     return this.dataSource.filteredData.length;
   }
 
+  getTotalProductCount(): number {
+    return this.categories.reduce((total, category) => total + category.productCount, 0);
+  }
+
   createCategory(): void {
     this.router.navigate(['/categories/new']);
   }
@@ -776,6 +844,14 @@ export class CategoryListComponent implements OnInit {
   }
 
   deleteCategory(category: Category): void {
+    if (category.productCount > 0) {
+      this.snackBar.open('Cannot delete category with existing products', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar'],
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
         title: 'Delete Category',
@@ -797,8 +873,8 @@ export class CategoryListComponent implements OnInit {
             this.loadCategories();
           },
           error: (error) => {
-            console.error('Can not delete this Category, there is linked products to this category:', error);
-            this.snackBar.open('Can not delete this Category, there is linked products to this category', 'Close', {
+            console.error('Error deleting category:', error);
+            this.snackBar.open('Cannot delete this category, there are linked products to this category', 'Close', {
               duration: 3000,
               panelClass: ['error-snackbar'],
             });

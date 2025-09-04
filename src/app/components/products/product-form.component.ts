@@ -100,6 +100,7 @@ import { forkJoin } from 'rxjs';
                         <div class="category-option">
                           <mat-icon class="category-icon">category</mat-icon>
                           {{ category.name }}
+                          <span class="category-count">({{ category.productCount }} products)</span>
                         </div>
                       </mat-option>
                     </mat-select>
@@ -402,6 +403,12 @@ import { forkJoin } from 'rxjs';
       width: 1rem;
       height: 1rem;
       color: var(--primary-color);
+    }
+
+    .category-count {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-left: auto;
     }
 
     .currency-option {
@@ -707,23 +714,23 @@ export class ProductFormComponent implements OnInit {
     }
   }
 
-getCurrencySymbol(): string {
-  const currency = this.productForm.get('currency')?.value || 'USD';
-  const symbols: { [key: string]: string } = {
-    'USD': '$',
-    'EUR': '€',
-    'GBP': '£',
-    'EGP': 'E£'
-  };
-  return symbols[currency] || '$';
-}
+  getCurrencySymbol(): string {
+    const currency = this.productForm.get('currency')?.value || 'USD';
+    const symbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'EGP': 'E£'
+    };
+    return symbols[currency] || '$';
+  }
 
   onSubmit(): void {
     if (this.productForm.valid) {
       this.submitting = true;
       const formValue = { ...this.productForm.value };
 
-      // Remove empty currency field
+      // For updates, ensure categoryId is included
       if (!formValue.currency) {
         delete formValue.currency;
       }
